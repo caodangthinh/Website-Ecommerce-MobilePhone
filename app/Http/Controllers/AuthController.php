@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthController extends Controller
 {
@@ -46,12 +47,20 @@ class AuthController extends Controller
                     'answer' => $request->answer
                 ]);
     
-                return response()->json([
-                    'success' => true,
-                    'message' => 'User Register Successfully',
-                    'user' => $user,
-                    'token' => $user->createToken("API TOKEN")->plainTextToken
-                ], 200);
+                $token = JWTAuth::attempt([
+                    "email" => $request->email,
+                    "password" => $request->password
+                ]);
+        
+                if(!empty($token)){
+        
+                    return response()->json([
+                        "status" => true,
+                        "message" => 'User Register Successfully',
+                        'user' => $user,
+                        "token" => $token
+                    ], 200);
+                }
     
             } catch (\Throwable $th) {
                 return response()->json([
@@ -84,13 +93,21 @@ class AuthController extends Controller
                     ], 401);
                 }
                 $user = User::where('email', $request->email)->first();
-    
-                return response()->json([
-                    'success' => true,
-                    'message' => 'User Login Successfully',
-                    'user' => $user,
-                    'token' => $user->createToken("API TOKEN")->plainTextToken
-                ], 200);
+
+                $token = JWTAuth::attempt([
+                    "email" => $request->email,
+                    "password" => $request->password
+                ]);
+        
+                if(!empty($token)){
+        
+                    return response()->json([
+                        "status" => true,
+                        "message" => 'User Login Successfully',
+                        'user' => $user,
+                        "token" => $token
+                    ], 200);
+                }
     
             } catch (\Throwable $th) {
                 return response()->json([
@@ -98,6 +115,56 @@ class AuthController extends Controller
                     'message' => $th->getMessage()
             ], 500);
         
+        }
+    }
+    public function refreshToken(){
+        
+        $newToken = auth()->refresh();
+
+        return response()->json([
+            "status" => true,
+            "message" => "New access token",
+            "token" => $newToken
+        ]);
+    }
+
+    public function getUser(Request $request)
+    {
+        try{
+            $userdata = auth()->user();
+
+            return response()->json([
+                "status" => true,
+                "message" => "Profile data",
+                "user" => $userdata
+            ], 200);    
+        } catch (\Throwable $th) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $th->getMessage()
+            ], 500);
+        }
+        
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user(); 
+        if ($user) {
+            $user->tokens()->delete();
+            
+            Auth::logout();
+            
+            $cookie = cookie('remember_web', null, -1);
+            return response()->json([
+                'success' => true,
+                'message' => 'Logged out successfully'
+            ])->withCookie($cookie);
+        } else {
+            return response()->json([
+                'success' => false,
+                'message' => 'No user logged in'
+            ], 401);
         }
     }
 }

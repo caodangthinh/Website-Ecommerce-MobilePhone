@@ -148,4 +148,23 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    public function deleteProduct(Request $request, $id)
+{
+    try {
+        $product = Product::findOrFail($id);
+        $product->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Delete Product Successfully!',
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Error in Deleting Product!',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
 }

@@ -15,5 +15,7 @@ Route::group([
     Route::put('/update-product/{pid}', [ProductController::class, 'updateProduct'])
         ->name('product.update')
         ->middleware('auth:api', 'admin');
-
+    Route::delete('/delete-product/{pid}', [ProductController::class, 'deleteProduct'])
+        ->name('product.delete')
+        ->middleware('auth:api', 'admin');
 });

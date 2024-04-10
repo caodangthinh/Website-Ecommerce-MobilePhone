@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CategoryController extends Controller
 {
-    public function CategoryController ()
+    public function createCategory(Request $request)
     {
         try {
             $request->validate([
@@ -78,6 +78,25 @@ class CategoryController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error in updating category!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function deleteCategory(Request $request, $id)
+    {
+        try {
+            $category = Category::findOrFail($id);
+            $category->delete();
+    
+            return response()->json([
+                'success' => true,
+                'message' => 'Delete Category Successfully!',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Deleting Category!',
                 'error' => $e->getMessage(),
             ], 500);
         }

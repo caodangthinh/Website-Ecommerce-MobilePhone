@@ -128,25 +128,6 @@ class AuthController extends Controller
         ]);
     }
 
-    public function getUser(Request $request)
-    {
-        try{
-            $userdata = auth()->user();
-
-            return response()->json([
-                "status" => true,
-                "message" => "Profile data",
-                "user" => $userdata
-            ], 200);    
-        } catch (\Throwable $th) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $th->getMessage()
-            ], 500);
-        }
-        
-    }
-
     public function logout(Request $request)
     {
         $user = $request->user(); 
@@ -166,5 +147,58 @@ class AuthController extends Controller
                 'message' => 'No user logged in'
             ], 401);
         }
+    }
+
+    public function forgotPassword(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'email' => 'required|email',
+                'answer' => 'required',
+                'newPassword' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'message' => 'Validation error',
+                    'errors' => $validator->errors()
+                ], 400);
+            }
+
+            $user = User::where('email', $request->email)
+                ->where('answer', $request->answer)
+                ->first();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Wrong Email or Answer!'
+                ], 404);
+            }
+
+            $user->password = Hash::make($request->newPassword);
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Password reset successfully!',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error!',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function userAuth(Request $request)
+    {
+        return response()->json(['ok' => true], 200);
+    }
+
+    public function adminAuth(Request $request)
+    {
+        return response()->json(['ok' => true], 200);
     }
 }

@@ -18,4 +18,6 @@ Route::group([
     Route::delete('/delete-product/{pid}', [ProductController::class, 'deleteProduct'])
         ->name('product.delete')
         ->middleware('auth:api', 'admin');
+    Route::get('/get-product/{slug}', [ProductController::class, 'getSingleProduct'])->name('product.get-product-single');
+    
 });

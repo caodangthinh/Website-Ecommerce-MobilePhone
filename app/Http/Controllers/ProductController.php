@@ -150,21 +150,46 @@ class ProductController extends Controller
     }
 
     public function deleteProduct(Request $request, $id)
-{
-    try {
-        $product = Product::findOrFail($id);
-        $product->delete();
+    {
+        try {
+            $product = Product::findOrFail($id);
+            $product->delete();
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Delete Product Successfully!',
-        ], 200);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Error in Deleting Product!',
-            'error' => $e->getMessage(),
-        ], 500);
+            return response()->json([
+                'success' => true,
+                'message' => 'Delete Product Successfully!',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Deleting Product!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-}
+    public function getSingleProduct($slug)
+    {
+        try {
+            $product = Product::where('slug', $slug)->with('category:id,name')->first();
+
+            if (!$product) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Product not found!',
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Get single Product Successfully!',
+                'product' => $product,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting single Product!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

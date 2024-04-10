@@ -16,7 +16,7 @@ class CreateProductsTable extends Migration
             $table->decimal('price', 10, 2);
             $table->unsignedBigInteger('category_id');
             $table->integer('quantity');
-            $table->binary('image')->nullable();
+            $table->string('image')->nullable();
             $table->boolean('shipping');
             $table->timestamps();
 

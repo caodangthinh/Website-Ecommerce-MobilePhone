@@ -12,4 +12,8 @@ Route::group([
         ->name('product.create')
         ->middleware('auth:api', 'admin');
     Route::get('/image-product/{pid}', [ProductController::class, 'getProductImage'])->name('product.get-product-image');
+    Route::put('/update-product/{pid}', [ProductController::class, 'updateProduct'])
+        ->name('product.update')
+        ->middleware('auth:api', 'admin');
+
 });

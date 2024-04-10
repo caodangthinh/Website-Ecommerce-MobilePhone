@@ -41,9 +41,9 @@ class ProductController extends Controller
                 'description' => 'required',
                 'price' => 'required|numeric',
                 'quantity' => 'required|integer',
-                'shipping' => 'required|boolean',
+                'shipping' => 'boolean',
                 'category_id' => 'required|exists:categories,id',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048', 
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
             ]);
     
             $image = $request->file('image');
@@ -98,45 +98,52 @@ class ProductController extends Controller
         }
     }
 
-    public function updateProduct(Request $request, $pid)
+    public function updateProduct(Request $request, $id)
     {
         try {
-            $request->validate([
+            $product = Product::findOrFail($id);
+            $validatedData = $request->validate([
                 'name' => 'required',
                 'description' => 'required',
                 'price' => 'required|numeric',
                 'quantity' => 'required|integer',
-                'category' => 'required',
-                'shipping' => 'required',
-                'image' => 'image|max:1000', // max 1MB
+                'shipping' => 'boolean',
+                'category_id' => 'required|exists:categories,id',
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
-
-            $product = Product::findOrFail($pid);
-
-            $product->name = $request->name;
-            $product->slug = Str::slug($request->name);
-            $product->description = $request->description;
-            $product->price = $request->price;
-            $product->quantity = $request->quantity;
-            $product->category = $request->category;
-            $product->shipping = $request->shipping;
-
+            
+            // Update product fields
+            $product->name = $validatedData['name'];
+            $product->description = $validatedData['description'];
+            $product->price = $validatedData['price'];
+            $product->quantity = $validatedData['quantity'];
+            $product->shipping = $validatedData['shipping'];
+            $product->category_id = $validatedData['category_id'];
+    
+            // Handle image update
             if ($request->hasFile('image')) {
-                $imagePath = $request->file('image')->store('images');
-                $product->image = $imagePath;
+                $image = $request->file('image');
+                $imageName = $image->getClientOriginalName();
+                if ($product->image) {
+                    unlink(public_path('images/' . $product->image));
+                }
+                $image->move(public_path('images'), $imageName);
+                $product->image = $imageName;
             }
-
+        
+    
+            // Save the updated product
             $product->save();
-
+    
             return response()->json([
                 'success' => true,
-                'message' => 'Update Product Successfully!',
+                'message' => 'Product updated successfully!',
                 'product' => $product,
-            ], 201);
+            ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error in Updating Product!',
+                'message' => 'Error in updating product!',
                 'error' => $e->getMessage(),
             ], 500);
         }

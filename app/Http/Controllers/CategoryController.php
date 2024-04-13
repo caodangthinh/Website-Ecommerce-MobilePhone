@@ -14,20 +14,20 @@ class CategoryController extends Controller
         try {
             $request->validate([
                 'name' => 'required',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
-    
+
             $image = $request->file('image');
             $imageName = $image->getClientOriginalName();
-    
+
             $image->move(public_path('images'), $imageName);
-    
+
             $category = new Category();
             $category->name = $request->name;
             $category->slug = Str::slug($request->name);
             $category->image = $imageName;
             $category->save();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'New Category created!',
@@ -49,7 +49,7 @@ class CategoryController extends Controller
 
             $request->validate([
                 'name' => 'required',
-                'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
 
             $category->name = $request->name;
@@ -88,7 +88,7 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
             $category->delete();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Delete Category Successfully!',
@@ -101,4 +101,24 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
+    public function listCategoryController(Request $request)
+    {
+        try {
+            $categories = Category::all()->except('image');
+            return response()->json([
+                'success' => true,
+                'message' => 'Get all Categories Successfully!',
+                'categories' => $categories,
+            ], 200);
+        } catch (\Exception $error) {
+            Log::error($error);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting all Categories!',
+                'error' => $error->getMessage(),
+            ], 500);
+        }
+    }
+
 }

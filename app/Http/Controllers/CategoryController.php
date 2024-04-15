@@ -145,4 +145,43 @@ class CategoryController extends Controller
         }
     }
 
+    public function categoryImage($id)
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category || !$category->image) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category or Image not found!',
+                ], 404);
+            }
+
+            $imagePath = public_path('images/') . $category->image;
+
+            if (!file_exists($imagePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image file not found!',
+                ], 404);
+            }
+
+            // Read the image file and return its contents
+            $imageContents = file_get_contents($imagePath);
+
+            // Determine the MIME type of the image
+            $mimeType = mime_content_type($imagePath);
+
+            // Set the response headers and return the image contents
+            return response($imageContents)->header('Content-Type', $mimeType);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting Image of Category!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 }

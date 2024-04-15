@@ -322,4 +322,40 @@ class ProductController extends Controller
             ], 400);
         }
     }
+
+    public function productCategory(Request $request, $slug)
+    {
+        try {
+            // Tìm kiếm danh mục dựa trên slug
+            $category = Category::where('slug', $slug)->first();
+
+            // Nếu không tìm thấy danh mục, trả về thông báo lỗi
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found!',
+                ], 404);
+            }
+
+            // Nếu tìm thấy danh mục, tiếp tục tìm kiếm sản phẩm
+            $products = Product::where('category_id', $category->id)->with('category')->get(['id', 'name', 'description', 'price']);
+
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+                'products' => $products,
+            ], 200);
+        } catch (\Exception $error) {
+            // Log lỗi nếu cần
+            \Log::error($error);
+
+            // Trả về thông báo lỗi phù hợp
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in getting Product!',
+                'error' => $error->getMessage(),
+            ], 500);
+        }
+    }
+
 }

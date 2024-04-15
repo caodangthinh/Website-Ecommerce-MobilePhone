@@ -30,5 +30,7 @@ Route::group([
         ->name('product.search-product');
     Route::get('/related-product/{pid}/{cid}', [ProductController::class, 'relatedProduct'])
         ->name('product.related-product');
+    Route::get('product-category/{slug}', [ProductController::class, 'productCategory'])
+        ->name('product.product-category');
 
 });

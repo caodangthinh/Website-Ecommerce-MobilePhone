@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CategoryController;
 
 Route::group([
-    'as'     => 'category',
+    'as' => 'category',
     'prefix' => '/api/v1/category',
 ], function () {
     Route::post('/create-category', [CategoryController::class, 'createCategory'])
@@ -16,4 +16,12 @@ Route::group([
     Route::delete('/delete-category/{pid}', [CategoryController::class, 'deleteCategory'])
         ->name('category.delete')
         ->middleware('auth:api', 'admin');
+    Route::get('/list-category', [CategoryController::class, 'listCategoryController'])
+        ->name('category.list');
+    Route::get('/single-category/{slug}', [CategoryController::class, 'singleCategory'])
+        ->name('category.single-category');
+    Route::get('/image-category/{id}', [CategoryController::class, 'categoryImage'])
+        ->name('category.categoryImage');
+
+
 });

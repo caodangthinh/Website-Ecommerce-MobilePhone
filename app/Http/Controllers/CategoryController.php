@@ -14,20 +14,20 @@ class CategoryController extends Controller
         try {
             $request->validate([
                 'name' => 'required',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
-    
+
             $image = $request->file('image');
             $imageName = $image->getClientOriginalName();
-    
+
             $image->move(public_path('images'), $imageName);
-    
+
             $category = new Category();
             $category->name = $request->name;
             $category->slug = Str::slug($request->name);
             $category->image = $imageName;
             $category->save();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'New Category created!',
@@ -49,7 +49,7 @@ class CategoryController extends Controller
 
             $request->validate([
                 'name' => 'required',
-                'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
+                'image' => 'image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
 
             $category->name = $request->name;
@@ -88,7 +88,7 @@ class CategoryController extends Controller
         try {
             $category = Category::findOrFail($id);
             $category->delete();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Delete Category Successfully!',
@@ -101,4 +101,87 @@ class CategoryController extends Controller
             ], 500);
         }
     }
+
+    public function listCategoryController(Request $request)
+    {
+        try {
+            $categories = Category::all()->except('image');
+            return response()->json([
+                'success' => true,
+                'message' => 'Get all Categories Successfully!',
+                'categories' => $categories,
+            ], 200);
+        } catch (\Exception $error) {
+            Log::error($error);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting all Categories!',
+                'error' => $error->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function singleCategory($slug)
+    {
+        try {
+            $category = Category::where('slug', $slug)->select('id', 'name')->first();
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found!',
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Get single Category Successfully!',
+                'category' => $category,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting single Category!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function categoryImage($id)
+    {
+        try {
+            $category = Category::find($id);
+
+            if (!$category || !$category->image) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category or Image not found!',
+                ], 404);
+            }
+
+            $imagePath = public_path('images/') . $category->image;
+
+            if (!file_exists($imagePath)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Image file not found!',
+                ], 404);
+            }
+
+            // Read the image file and return its contents
+            $imageContents = file_get_contents($imagePath);
+
+            // Determine the MIME type of the image
+            $mimeType = mime_content_type($imagePath);
+
+            // Set the response headers and return the image contents
+            return response($imageContents)->header('Content-Type', $mimeType);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting Image of Category!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+
 }

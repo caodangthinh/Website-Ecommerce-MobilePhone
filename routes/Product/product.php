@@ -32,5 +32,7 @@ Route::group([
         ->name('product.related-product');
     Route::get('product-category/{slug}', [ProductController::class, 'productCategory'])
         ->name('product.product-category');
+    Route::get('/braintree/token', [ProductController::class, 'braintreeTokenController'])
+        ->name('braintree.token');
 
 });

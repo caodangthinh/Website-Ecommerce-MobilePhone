@@ -7,6 +7,8 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
+use Braintree\Gateway;
+
 
 class ProductController extends Controller
 {
@@ -353,6 +355,29 @@ class ProductController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error in getting Product!',
+                'error' => $error->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function braintreeTokenController()
+    {
+        try {
+            $gateway = new Gateway([
+                'environment' => env('BRAINTREE_ENVIRONMENT'),
+                'merchantId' => env('BRAINTREE_MERCHANT_ID'),
+                'publicKey' => env('BRAINTREE_PUBLIC_KEY'),
+                'privateKey' => env('BRAINTREE_PRIVATE_KEY')
+            ]);
+
+            $clientToken = $gateway->clientToken()->generate();
+
+            return response()->json($clientToken);
+        } catch (\Exception $error) {
+            \Log::error($error);
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in generating Braintree token!',
                 'error' => $error->getMessage(),
             ], 500);
         }

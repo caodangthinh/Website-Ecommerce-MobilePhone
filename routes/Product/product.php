@@ -20,5 +20,8 @@ Route::group([
         ->middleware('auth:api', 'admin');
     Route::get('/get-product/{slug}', [ProductController::class, 'getSingleProduct'])
         ->name('product.get-product-single');
+    Route::post('/product-filters', [ProductController::class, 'productFilters'])
+        ->name('product.filter');
+
 
 });

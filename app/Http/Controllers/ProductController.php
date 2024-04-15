@@ -43,15 +43,15 @@ class ProductController extends Controller
                 'quantity' => 'required|integer',
                 'shipping' => 'boolean',
                 'category_id' => 'required|exists:categories,id',
-                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048', 
+                'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
-    
+
             $image = $request->file('image');
             $imageName = $image->getClientOriginalName();
-    
+
             // Lưu tệp tin vào thư mục public/images
             $image->move(public_path('images'), $imageName);
-    
+
             $product = new Product();
             $product->name = $request->name;
             $product->slug = Str::slug($request->name);
@@ -61,7 +61,7 @@ class ProductController extends Controller
             $product->category_id = $request->category_id;
             $product->image = $imageName; // Lưu tên file ảnh vào cơ sở dữ liệu
             $product->save();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'New Product created!',
@@ -84,7 +84,7 @@ class ProductController extends Controller
                 abort(404);
             }
             $imagePath = public_path('images/' . $product->image);
-    
+
             if (!file_exists($imagePath)) {
                 abort(404);
             }
@@ -111,7 +111,7 @@ class ProductController extends Controller
                 'category_id' => 'required|exists:categories,id',
                 'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
             ]);
-            
+
             // Update product fields
             $product->name = $validatedData['name'];
             $product->description = $validatedData['description'];
@@ -119,7 +119,7 @@ class ProductController extends Controller
             $product->quantity = $validatedData['quantity'];
             $product->shipping = $validatedData['shipping'];
             $product->category_id = $validatedData['category_id'];
-    
+
             // Handle image update
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
@@ -130,11 +130,11 @@ class ProductController extends Controller
                 $image->move(public_path('images'), $imageName);
                 $product->image = $imageName;
             }
-        
-    
+
+
             // Save the updated product
             $product->save();
-    
+
             return response()->json([
                 'success' => true,
                 'message' => 'Product updated successfully!',
@@ -167,7 +167,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
-    
+
     public function getSingleProduct($slug)
     {
         try {
@@ -193,4 +193,37 @@ class ProductController extends Controller
             ], 500);
         }
     }
+
+    public function productFilters(Request $request)
+    {
+        try {
+            $checked = $request->input('checked', []);
+            $radio = $request->input('radio', []);
+
+            $query = Product::query();
+
+            if (count($checked) > 0) {
+                $query->whereIn('category', $checked);
+            }
+
+            if (count($radio) === 2) {
+                $query->where('price', '>=', $radio[0])
+                    ->where('price', '<=', $radio[1]);
+            }
+
+            $products = $query->get();
+
+            return response()->json([
+                'success' => true,
+                'products' => $products,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error While Filtering Products!',
+                'error' => $e->getMessage(),
+            ], 400);
+        }
+    }
+
 }

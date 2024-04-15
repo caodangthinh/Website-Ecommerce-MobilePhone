@@ -359,27 +359,71 @@ class ProductController extends Controller
         }
     }
 
-    public function braintreeTokenController()
+    public function getToken()
+    {
+        $gateway = new \Braintree\Gateway([
+            'environment' => env('BRAINTREE_ENVIRONMENT'),
+            'merchantId' => env('BRAINTREE_MERCHANT_ID'),
+            'publicKey' => env('BRAINTREE_PUBLIC_KEY'),
+            'privateKey' => env('BRAINTREE_PRIVATE_KEY')
+        ]);
+
+        $clientToken = $gateway->clientToken()->generate();
+        return response()->json(['clientToken' => $clientToken]);
+    }
+
+    // Xử lý thanh toán với BrainTree
+    public function handlePayment(Request $request)
     {
         try {
-            $gateway = new Gateway([
+            $nonce = $request->input('nonce');
+            $cart = $request->input('cart');
+
+            $gateway = new \Braintree\Gateway([
                 'environment' => env('BRAINTREE_ENVIRONMENT'),
                 'merchantId' => env('BRAINTREE_MERCHANT_ID'),
                 'publicKey' => env('BRAINTREE_PUBLIC_KEY'),
                 'privateKey' => env('BRAINTREE_PRIVATE_KEY')
             ]);
 
-            $clientToken = $gateway->clientToken()->generate();
+            $total = 0;
+            foreach ($cart as $item) {
+                $total += $item['price'];
+            }
 
-            return response()->json($clientToken);
-        } catch (\Exception $error) {
-            \Log::error($error);
+            $result = $gateway->transaction()->sale([
+                'amount' => $total,
+                'paymentMethodNonce' => $nonce,
+                'options' => [
+                    'submitForSettlement' => true
+                ]
+            ]);
+
+            if ($result->success) {
+                // Lưu thông tin đơn hàng và thanh toán vào cơ sở dữ liệu
+                $order = new Order();
+                $order->user_id = auth()->id(); // Lấy ID của người dùng đăng nhập
+                $order->payment_status = json_encode($result);
+                $order->save();
+
+                // Lưu chi tiết đơn hàng vào cơ sở dữ liệu
+                foreach ($cart as $item) {
+                    $order->products()->attach($item['id'], [
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price']
+                    ]);
+                }
+
+                return response()->json(['success' => true, 'order_id' => $order->id]);
+            } else {
+                return response()->json(['success' => false, 'message' => 'Payment failed']);
+            }
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error in generating Braintree token!',
-                'error' => $error->getMessage(),
+                'message' => 'Error processing payment',
+                'error' => $e->getMessage()
             ], 500);
         }
     }
-
 }

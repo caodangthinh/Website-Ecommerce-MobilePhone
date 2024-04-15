@@ -121,4 +121,28 @@ class CategoryController extends Controller
         }
     }
 
+    public function singleCategory($slug)
+    {
+        try {
+            $category = Category::where('slug', $slug)->select('id', 'name')->first();
+            if (!$category) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Category not found!',
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'Get single Category Successfully!',
+                'category' => $category,
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in Getting single Category!',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
 }

@@ -19,4 +19,7 @@ Route::group([
     Route::get('/list-category', [CategoryController::class, 'listCategoryController'])
         ->name('category.list');
 
+    Route::get('/single-category/{slug}', [CategoryController::class, 'singleCategory'])
+        ->name('category.single-category');
+
 });

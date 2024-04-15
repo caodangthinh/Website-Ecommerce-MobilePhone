@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 
 Route::group([
-    'as'     => 'product',
+    'as' => 'product',
     'prefix' => '/api/v1/product',
 ], function () {
     Route::get('/get-product', [ProductController::class, 'getAllProduct'])->name('product.getall');
@@ -18,6 +18,7 @@ Route::group([
     Route::delete('/delete-product/{pid}', [ProductController::class, 'deleteProduct'])
         ->name('product.delete')
         ->middleware('auth:api', 'admin');
-    Route::get('/get-product/{slug}', [ProductController::class, 'getSingleProduct'])->name('product.get-product-single');
-    
+    Route::get('/get-product/{slug}', [ProductController::class, 'getSingleProduct'])
+        ->name('product.get-product-single');
+
 });

@@ -226,4 +226,25 @@ class ProductController extends Controller
         }
     }
 
+    public function countProduct()
+    {
+        try {
+            $total = Product::count();
+
+            return response()->json([
+                'success' => true,
+                'total' => $total,
+            ], 200);
+        } catch (\Exception $e) {
+            // Log the error if needed
+            \Log::error($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error While Counting Products!',
+                'error' => $e->getMessage(), // Return error message for debugging purposes
+            ], 400);
+        }
+    }
+
 }

@@ -22,6 +22,8 @@ Route::group([
         ->name('product.get-product-single');
     Route::post('/product-filters', [ProductController::class, 'productFilters'])
         ->name('product.filter');
+    Route::get('/count-products', [ProductController::class, 'countProduct'])
+        ->name('product.count-product');
 
 
 });

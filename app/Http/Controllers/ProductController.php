@@ -247,7 +247,7 @@ class ProductController extends Controller
         }
     }
 
-    public function productListController(Request $request)
+    public function listProduct(Request $request)
     {
         try {
             $perPage = 6;
@@ -275,4 +275,26 @@ class ProductController extends Controller
         }
     }
 
+    public function searchProduct(Request $request)
+    {
+        try {
+            $keyword = $request->input('keyword');
+
+            $results = Product::where('name', 'like', "%$keyword%")
+                ->orWhere('description', 'like', "%$keyword%")
+                ->select('id', 'name', 'price', 'description')
+                ->get();
+
+            return response()->json($results, 200);
+        } catch (\Exception $e) {
+            // Log the error if needed
+            \Log::error($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in search product API!',
+                'error' => $e->getMessage(), // Return error message for debugging purposes
+            ], 400);
+        }
+    }
 }

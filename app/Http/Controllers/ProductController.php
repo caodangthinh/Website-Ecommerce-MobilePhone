@@ -247,4 +247,32 @@ class ProductController extends Controller
         }
     }
 
+    public function productListController(Request $request)
+    {
+        try {
+            $perPage = 6;
+            $page = $request->input('page', 1);
+
+            $products = Product::select('id', 'name', 'price', 'description') // Không chọn trường 'image'
+                ->skip(($page - 1) * $perPage)
+                ->take($perPage)
+                ->orderByDesc('created_at')
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'products' => $products,
+            ], 200);
+        } catch (\Exception $e) {
+            // Log the error if needed
+            \Log::error($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in getting products per page!',
+                'error' => $e->getMessage(), // Return error message for debugging purposes
+            ], 400);
+        }
+    }
+
 }

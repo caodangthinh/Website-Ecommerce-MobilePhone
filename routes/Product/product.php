@@ -24,6 +24,8 @@ Route::group([
         ->name('product.filter');
     Route::get('/count-products', [ProductController::class, 'countProduct'])
         ->name('product.count-product');
+    Route::get('/product-list/{page}', [ProductController::class, 'productListController'])
+        ->name('product.list-product');
 
 
 });

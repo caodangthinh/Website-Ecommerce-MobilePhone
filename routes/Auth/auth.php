@@ -17,4 +17,6 @@ Route::group([
     Route::get('/admin-auth', [AuthController::class, 'adminAuth'])->middleware('auth:api', 'admin');
     Route::put('/profile', [AuthController::class, 'updateProfile'])->middleware('auth:api');
     Route::get('/orders', [AuthController::class, 'getOrders'])->middleware('auth:api');
+    Route::get('/all-orders', [AuthController::class, 'getAllOrders'])->middleware('auth:api', 'admin');
+    Route::put('/order-status/{orderId}', [AuthController::class, 'updateStatus'])->middleware(['auth', 'admin']);
 });

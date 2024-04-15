@@ -251,7 +251,7 @@ class AuthController extends Controller
                 $query->select('products.id', 'products.name', 'products.description', 'products.price', 'products.category_id', 'products.quantity', 'products.shipping');
             }, 'user:id,name'])->get();
 
-            return response()->json([$orders]);
+            return response()->json($orders);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -261,4 +261,39 @@ class AuthController extends Controller
         }
     }
 
+    public function getAllOrders(Request $request)
+    {
+        try {
+            $orders = Order::with(['products' => function ($query) {
+                $query->select('products.id', 'products.name', 'products.description', 'products.price', 'products.category_id', 'products.quantity', 'products.shipping');
+            }, 'user:id,name'])->get();
+    
+            return response()->json($orders);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error while retrieving orders',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    public function updateStatus(Request $request, $orderId)
+    {
+        try {
+            $status = $request->input('status');
+
+            $order = Order::findOrFail($orderId);
+            $order->status = $status;
+            $order->save();
+
+            return response()->json($order);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error While Updating Order',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

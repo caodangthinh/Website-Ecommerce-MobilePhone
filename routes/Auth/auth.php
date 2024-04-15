@@ -15,5 +15,6 @@ Route::group([
 
     Route::get('/user-auth', [AuthController::class, 'userAuth'])->middleware('auth:api');
     Route::get('/admin-auth', [AuthController::class, 'adminAuth'])->middleware('auth:api', 'admin');
-    
+    Route::put('/profile', [AuthController::class, 'updateProfile'])->middleware('auth:api');
+    Route::get('/orders', [AuthController::class, 'getOrders'])->middleware('auth:api');
 });

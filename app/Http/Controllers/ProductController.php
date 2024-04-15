@@ -297,4 +297,29 @@ class ProductController extends Controller
             ], 400);
         }
     }
+
+    public function relatedProduct($pid, $cid)
+    {
+        try {
+            $products = Product::where('category_id', $cid)
+                ->where('id', '!=', $pid)
+                ->with('category')
+                ->limit(3)
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'products' => $products,
+            ], 200);
+        } catch (\Exception $e) {
+            // Log the error if needed
+            \Log::error($e);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error in getting related products!',
+                'error' => $e->getMessage(), // Return error message for debugging purposes
+            ], 400);
+        }
+    }
 }

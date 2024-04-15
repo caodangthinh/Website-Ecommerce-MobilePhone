@@ -28,6 +28,7 @@ Route::group([
         ->name('product.list-product');
     Route::get('/search/{keyword}', [ProductController::class, 'searchProduct'])
         ->name('product.search-product');
-
+    Route::get('/related-product/{pid}/{cid}', [ProductController::class, 'relatedProduct'])
+        ->name('product.related-product');
 
 });

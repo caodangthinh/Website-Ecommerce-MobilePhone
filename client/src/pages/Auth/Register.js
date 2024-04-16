@@ -34,70 +34,38 @@ const Register = () => {
 
     return (
         <Layout title={'Register - PhoneShop'}>
-            {/* <div className="vh-100 bg-image" style={{ backgroundImage: 'url("https://mdbcdn.b-cdn.net/img/Photos/new-templates/search-box/img4.webp")' }}> */}
-            <div className="mask d-flex align-items-center h-100 gradient-custom-3 p-5">
-                <div className="container h-100">
-                    <div className="row d-flex justify-content-center align-items-center h-100">
-                        <div className="col-12 col-md-9 col-lg-7 col-xl-6">
-                            <div className="card" style={{ borderRadius: 15 }}>
-                                <div className="card-body p-5">
-                                    <h2 className="text-uppercase text-center mb-5">Create an account</h2>
-                                    <form onSubmit={handleSubmit}>
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example1cg">Your Name</label>
-                                            <input type="text" onChange={(e) => setName(e.target.value)} value={name} id="form3Example1cg" className="form-control form-control-lg" placeholder='Enter your Name' required />
-                                        </div>
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example3cg">Your Email</label>
-
-                                            <input type="email" onChange={(e) => setEmail(e.target.value)} value={email} id="form3Example3cg" className="form-control form-control-lg" placeholder='Enter your Email' required />
-                                        </div>
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example4cg">Password</label>
-
-                                            <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} id="form3Example4cg" className="form-control form-control-lg" placeholder='Enter your Password' required />
-                                        </div>
-                                        {/* <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example4cdg">Repeat your password</label>
-
-                                            <input type="password" id="form3Example4cdg" className="form-control form-control-lg" placeholder='Repeat your Password' />
-                                        </div> */}
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example1cg">Your Phone</label>
-
-                                            <input type="text" onChange={(e) => setPhone(e.target.value)} value={phone} id="form3Example1cg" className="form-control form-control-lg" placeholder='Enter your Phone' required />
-                                        </div>
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example1cg">Your Address</label>
-
-                                            <input type="text" onChange={(e) => setAddress(e.target.value)} value={address} id="form3Example1cg" className="form-control form-control-lg" placeholder='Enter your Address' required />
-                                        </div>
-                                        <div className="form-outline mb-4">
-                                            <label className="form-label" htmlFor="form3Example1cg">Your favorite Phone</label>
-
-                                            <input type="text" onChange={(e) => setAnswer(e.target.value)} value={answer} id="form3Example1cg" className="form-control form-control-lg" placeholder='Enter your Answer' required />
-                                        </div>
-                                        {/* <div className="form-check d-flex justify-content-center mb-5">
-                                            <input className="form-check-input me-2" type="checkbox" defaultValue id="form2Example3cg" />
-                                            <label className="form-check-label" htmlFor="form2Example3g">
-                                                I agree all statements in <a href="#!" className="text-body"><u>Terms of service</u></a>
-                                            </label>
-                                        </div> */}
-                                        <div className="d-flex justify-content-center">
-                                            <button type="submit" className="btn btn-success btn-block btn-lg gradient-custom-4 text-body">Register</button>
-                                        </div>
-                                        <p className="text-center text-muted mt-5 mb-0">Have already an account? <a href="/login" className="fw-bold text-body"><u>Login here</u></a></p>
-                                    </form>
-                                </div>
+            <div className="wrapper" id="container">
+                <div className="form-container login-container">
+                    <div className="form-login-sign">
+                        <form onSubmit={handleSubmit}>
+                            <div className="title-form">
+                                <h1>Register</h1>
                             </div>
-                        </div>
+                            <div className="field">
+                                <input type="text" onChange={(e) => setName(e.target.value)} value={name} placeholder="Enter your Name" className="password" id="name" name="name" required />
+                            </div>
+                            <div className="field">
+                                <input type="email" onChange={(e) => setEmail(e.target.value)} value={email} placeholder="Enter your Email" className="password" id="email" name="email" required />
+                            </div>
+                            <div className="field">
+                                <input type="password" onChange={(e) => setPassword(e.target.value)} value={password} placeholder="Enter your Password" className="password" id="password" name="password" required />
+                            </div>
+                            <div className="field">
+                                <input type="text" onChange={(e) => setPhone(e.target.value)} value={phone} placeholder="Enter your Phone" className="password" id="phone" name="phone" required />
+                            </div>
+                            <div className="field">
+                                <input type="text" onChange={(e) => setAddress(e.target.value)} value={address} placeholder="Enter your Address" className="password" id="address" name="address" required />
+                            </div>
+                            <div className="field">
+                                <input onChange={(e) => setAnswer(e.target.value)} value={answer} placeholder="Enter your Answer" className="password" id="answer" name="answer" required />
+                            </div>
+                            <button type="submit" className="btn-form">Register</button>
+                        </form>
                     </div>
                 </div>
             </div>
-            {/* </div> */}
-
         </Layout>
-    )
-}
+    );
+};
 
-export default Register
+export default Register;
